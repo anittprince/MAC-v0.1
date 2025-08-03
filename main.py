@@ -25,6 +25,9 @@ class MACAssistant:
         self.voice_input = None
         self.is_running = False
         
+        # Show AI services status
+        self._show_ai_status()
+        
         # Try to initialize voice input
         try:
             self.voice_input = VoiceInput(model_path)
@@ -172,6 +175,30 @@ class MACAssistant:
             self.voice_input.stop_continuous_listening()
         if self.voice_output:
             self.voice_output.stop_speaking()
+    
+    def _show_ai_status(self):
+        """Show the status of AI services."""
+        try:
+            ai_status = self.brain.get_ai_status()
+            print("\nAI Services Status:")
+            print("-" * 30)
+            
+            status_icons = {True: "✓", False: "✗"}
+            
+            print(f"{status_icons[ai_status['chatgpt']]} ChatGPT: {'Available' if ai_status['chatgpt'] else 'Not configured'}")
+            print(f"{status_icons[ai_status['google_search']]} Google Search: {'Available' if ai_status['google_search'] else 'Using fallback'}")
+            print(f"{status_icons[ai_status['youtube_search']]} YouTube Search: {'Available' if ai_status['youtube_search'] else 'Not available'}")
+            print(f"{status_icons[ai_status['weather']]} Weather: {'Available' if ai_status['weather'] else 'Not configured'}")
+            
+            if not any(ai_status.values()):
+                print("\n💡 To enable AI features, copy .env.template to .env and add your API keys")
+            else:
+                print("\n🤖 AI features are ready! Try asking general questions.")
+            
+            print()
+            
+        except Exception as e:
+            print(f"Could not check AI status: {e}")
 
 
 def print_banner():

@@ -1,14 +1,40 @@
 # MAC - Cross-Platform Voice Assistant
 
-A cross-platform voice assistant that works on Windows and Android, featuring voice input/output, command processing, and HTTP API communication.
+A cross-platform voice assistant that works on Windows and Android, featuring voice input/output, command processing, HTTP API communication, and **AI integration** for answering general questions.
 
 ## Features
 
 - **Voice Input/Output**: Uses Vosk for speech recognition and pyttsx3 for text-to-speech
+- **🤖 AI Integration**: ChatGPT integration, web search, and YouTube search capabilities
 - **Cross-Platform**: Supports Windows and Android
 - **HTTP API**: FastAPI server for remote command execution
 - **Modular Design**: Separate command modules for different platforms
 - **Real-time Communication**: Android app communicates with Python server over LAN
+- **Smart Fallback**: Graceful degradation from predefined commands to AI responses
+
+## New AI Capabilities
+
+🎉 **MAC now includes powerful AI features:**
+
+- **ChatGPT Integration**: Ask any general question and get intelligent responses
+- **Web Search**: Search for information using "search for [topic]" or "what is [something]"
+- **YouTube Search**: Find videos with "youtube [topic]" or "find video about [topic]"
+- **Weather Information**: Get weather updates (requires API key)
+- **Smart Fallback**: If MAC doesn't understand a command, it tries to answer using AI
+
+**Examples:**
+```
+User: "what is machine learning"
+MAC: "Machine learning is a subset of artificial intelligence..."
+
+User: "search for latest Python frameworks"
+MAC: "I found information about latest Python frameworks..."
+
+User: "youtube cooking tutorials"
+MAC: "I found 3 YouTube videos for 'cooking tutorials'..."
+```
+
+See [`docs/AI_INTEGRATION.md`](docs/AI_INTEGRATION.md) for detailed setup instructions.
 
 ## Project Structure
 
@@ -16,9 +42,10 @@ A cross-platform voice assistant that works on Windows and Android, featuring vo
 MAC-v0.1/
 ├── core/
 │   ├── __init__.py
-│   ├── brain.py          # Main command processor
+│   ├── brain.py          # Main command processor with AI integration
 │   ├── voice_input.py    # Voice recognition
-│   └── voice_output.py   # Text-to-speech
+│   ├── voice_output.py   # Text-to-speech
+│   └── ai_services.py    # AI services (ChatGPT, search, YouTube)
 ├── commands/
 │   ├── __init__.py
 │   ├── windows.py        # Windows-specific commands
@@ -40,8 +67,14 @@ MAC-v0.1/
 │       │   └── build.gradle.kts
 │       ├── build.gradle
 │       └── settings.gradle.kts
+├── docs/
+│   ├── AI_INTEGRATION.md    # AI setup and usage guide
+│   ├── API.md               # API documentation
+│   └── [other docs...]      # Additional documentation
 ├── main.py              # Main entry point
 ├── test_mac.py          # Quick test script
+├── test_ai.py           # AI integration test script
+├── .env.template        # Environment variables template
 ├── setup.bat            # Windows setup script
 ├── setup.sh             # Linux/Mac setup script
 ├── requirements.txt     # Python dependencies
