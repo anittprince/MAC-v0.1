@@ -1,0 +1,25 @@
+{
+  "command_sequences": {},
+  "time_patterns": {
+    "general": {
+      "night": 1
+    }
+  },
+  "context_triggers": {
+    "prince": {
+      "general": 1
+    },
+    "anitt": {
+      "general": 1
+    },
+    "who": {
+      "general": 1
+    }
+  },
+  "response_preferences": {},
+  "error_patterns": {},
+  "success_patterns": {
+    "general_casual_medium": 1
+  },
+  "custom_workflows": {}
+}

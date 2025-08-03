@@ -1,0 +1,38 @@
+{
+  "name": "User",
+  "preferred_name": "User",
+  "voice_settings": {
+    "wake_words": [
+      "MAC",
+      "Hey MAC",
+      "Computer"
+    ],
+    "response_style": "friendly",
+    "response_length": "medium",
+    "voice_speed": 200,
+    "voice_volume": 0.9
+  },
+  "preferences": {
+    "units": "metric",
+    "time_format": "12h",
+    "language": "en",
+    "timezone": "UTC",
+    "default_location": "",
+    "favorite_topics": [],
+    "work_hours": {
+      "start": "09:00",
+      "end": "17:00"
+    },
+    "personal_info": {}
+  },
+  "learning": {
+    "command_usage": {
+      "search": 1
+    },
+    "correction_history": [],
+    "habits": {},
+    "frequent_requests": []
+  },
+  "created_date": "2025-08-04T03:26:17.570137",
+  "last_interaction": "2025-08-04T03:26:29.209342"
+}

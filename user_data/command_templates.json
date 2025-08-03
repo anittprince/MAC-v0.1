@@ -1,0 +1,42 @@
+{
+  "shortcut": {
+    "name": "My Shortcut",
+    "description": "A simple shortcut command",
+    "action_type": "system",
+    "action": "echo Hello World",
+    "parameters": {}
+  },
+  "workflow": {
+    "name": "My Workflow",
+    "description": "A multi-step workflow",
+    "steps": [
+      {
+        "type": "command",
+        "command": "echo Step 1",
+        "delay": 1
+      },
+      {
+        "type": "command",
+        "command": "echo Step 2"
+      }
+    ],
+    "continue_on_error": false
+  },
+  "alias": {
+    "name": "My Alias",
+    "description": "An alias for another command",
+    "target_command": "echo {message}"
+  },
+  "web_shortcut": {
+    "name": "Quick Search",
+    "description": "Quick web search",
+    "action_type": "web",
+    "action": "https://www.google.com/search?q={query}"
+  },
+  "file_manager": {
+    "name": "Quick File Action",
+    "description": "File management shortcut",
+    "action_type": "file",
+    "action": "open:{filepath}"
+  }
+}

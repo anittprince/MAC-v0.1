@@ -1,0 +1,18 @@
+{
+  "daily_usage": {
+    "2025-08-04": 1
+  },
+  "hourly_patterns": {
+    "3": 1
+  },
+  "session_lengths": [],
+  "command_success_rates": {
+    "general": {
+      "success": 1,
+      "total": 1
+    }
+  },
+  "response_ratings": [],
+  "feature_adoption": {},
+  "error_rates": {}
+}
