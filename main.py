@@ -208,31 +208,25 @@ class MACAssistant:
         try:
             ai_status = self.brain.get_ai_status()
             print("\n🤖 AI Brain Status:")
-            print("-" * 30)
+            print("-" * 40)
             
             status_icons = {True: "✅", False: "❌"}
             
-            # Highlight ChatGPT as primary brain
-            if ai_status['chatgpt']:
-                print(f"{status_icons[ai_status['chatgpt']]} ChatGPT (PRIMARY BRAIN): Available")
-                print("   🧠 ChatGPT will handle all conversations and questions")
-            else:
-                print(f"{status_icons[ai_status['chatgpt']]} ChatGPT (PRIMARY BRAIN): Not configured")
-                print("   ⚠️  Using pattern-matching fallback mode")
-            
-            print(f"{status_icons[ai_status['google_search']]} Google Search: {'Available' if ai_status['google_search'] else 'Using fallback'}")
-            print(f"{status_icons[ai_status['youtube_search']]} YouTube Search: {'Available' if ai_status['youtube_search'] else 'Not available'}")
-            print(f"{status_icons[ai_status['weather']]} Weather: {'Available' if ai_status['weather'] else 'Not configured'}")
-            
-            if ai_status['chatgpt']:
-                print("\n🎉 ChatGPT Brain Mode: ON")
+            # Show Gemini status (primary and only AI)
+            if ai_status['gemini_available']:
+                print(f"{status_icons[ai_status['gemini_available']]} Gemini (PRIMARY AI): Available")
+                print(f"\n🧠 AI Brain Mode: ON (Gemini)")
                 print("   • Ask any question naturally")
-                print("   • Get intelligent, conversational responses")
+                print("   • Get intelligent, conversational responses")  
                 print("   • System commands work seamlessly")
+                print("   • Fast and reliable AI processing")
             else:
-                print("\n💡 To enable ChatGPT Brain:")
-                print("   1. Copy .env.template to .env")
-                print("   2. Add your OpenAI API key")
+                print(f"{status_icons[ai_status['gemini_available']]} Gemini (PRIMARY AI): Not configured")
+                print(f"\n❌ AI Brain Mode: OFF")
+                print("   ⚠️  Using pattern-matching fallback mode")
+                print("\n💡 To enable AI Brain:")
+                print("   1. Get API key from ai.google.dev")
+                print("   2. Add GEMINI_API_KEY to .env file")
                 print("   3. Restart MAC Assistant")
                 print("   4. Enjoy intelligent conversations!")
             

@@ -105,11 +105,11 @@ class MACBrain:
                 # Handle critical system commands directly (volume, shutdown, etc.)
                 return self._handle_system_command(command_type, text)
             
-            # For all other commands, try ChatGPT first
-            if self.ai_services.is_available()['chatgpt']:
-                return self._handle_chatgpt_primary(original_text, command_type, text)
+            # For all other commands, try AI first
+            if self.ai_services.is_ai_available():
+                return self._handle_ai_primary(original_text, command_type, text)
             else:
-                # Fallback to traditional pattern matching if ChatGPT unavailable
+                # Fallback to traditional pattern matching if AI unavailable
                 return self._handle_traditional_processing(command_type, text)
                 
         except Exception as e:
@@ -219,12 +219,10 @@ class MACBrain:
         """Handle unrecognized commands using AI as fallback."""
         try:
             # Check if AI services are available
-            services = self.ai_services.is_available()
-            
-            if services['chatgpt']:
-                # Ask ChatGPT to handle the question
+            if self.ai_services.is_ai_available():
+                # Ask AI to handle the question
                 context = "You are a voice assistant. The user said something that doesn't match predefined commands."
-                result = self.ai_services.ask_chatgpt(text, context)
+                result = self.ai_services.ask_ai(text, context)
                 
                 return {
                     'status': 'success' if result['success'] else 'ai_fallback',
@@ -317,57 +315,60 @@ class MACBrain:
     
     def get_ai_status(self) -> Dict[str, bool]:
         """Get the status of AI services."""
-        return self.ai_services.is_available()
+        return {
+            'gemini_available': self.ai_services.gemini_model is not None,
+            'ai_available': self.ai_services.is_ai_available()
+        }
     
     def _get_critical_commands(self) -> list:
-        """Get list of critical system commands that should bypass ChatGPT."""
+        """Get list of critical system commands that should bypass AI."""
         return ['volume', 'shutdown', 'system_info']
     
-    def _handle_chatgpt_primary(self, original_text: str, command_type: str, lower_text: str) -> Dict[str, Any]:
-        """Handle command with ChatGPT as primary processor."""
+    def _handle_ai_primary(self, original_text: str, command_type: str, lower_text: str) -> Dict[str, Any]:
+        """Handle command with AI (Gemini) as primary processor."""
         try:
-            # Create context for ChatGPT about available system functions
+            # Create context for AI about available system functions
             system_context = self._build_system_context(command_type)
             
-            # Ask ChatGPT to process the command
-            result = self.ai_services.ask_chatgpt(original_text, system_context)
+            # Ask AI to process the command
+            result = self.ai_services.ask_ai(original_text, system_context)
             
             if result['success']:
-                # Check if ChatGPT indicated this needs system function execution
+                # Check if AI indicated this needs system function execution
                 response_data = result.get('data', {})
+                ai_source = response_data.get('source', 'AI')
                 
-                # If ChatGPT suggests a system command, execute it
+                # If AI suggests a system command, execute it
                 if command_type and self._should_execute_system_command(result['message'], command_type):
                     system_result = self._execute_command(command_type, lower_text)
                     
-                    # Combine ChatGPT response with system execution
+                    # Combine AI response with system execution
                     combined_message = f"{result['message']}\n\nSystem: {system_result.get('message', 'Command executed')}"
                     
                     return {
                         'status': 'success',
                         'message': combined_message,
                         'data': {
-                            'chatgpt_response': result['message'],
+                            'ai_response': result['message'],
                             'system_result': system_result.get('data'),
-                            'source': 'ChatGPT + System'
+                            'source': f'{ai_source} + System'
                         }
                     }
                 else:
-                    # Pure ChatGPT response
+                    # Pure AI response
                     return {
                         'status': 'success',
                         'message': result['message'],
                         'data': {
-                            'source': 'ChatGPT',
-                            'tokens_used': response_data.get('tokens_used', 0)
+                            'source': ai_source
                         }
                     }
             else:
-                # ChatGPT failed, fallback to traditional processing
+                # AI failed, fallback to traditional processing
                 return self._handle_traditional_processing(command_type, lower_text)
                 
         except Exception as e:
-            # Error with ChatGPT, fallback to traditional processing
+            # Error with AI, fallback to traditional processing
             return self._handle_traditional_processing(command_type, lower_text)
     
     def _build_system_context(self, command_type: str) -> str:
