@@ -4,7 +4,9 @@ Processes natural language commands with personalization, memory, and learning.
 """
 
 import re
+import json
 import platform
+from pathlib import Path
 from typing import Dict, Any, Optional, List
 from commands.windows import WindowsCommands
 from commands.android import AndroidCommands
@@ -620,7 +622,77 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
                 "message": f"Error clearing session: {e}"
             }
     
+    def export_personalization_data(self, filepath: str = None) -> Dict[str, Any]:
+        """Export all personalization data."""
+        try:
+            import shutil
+            import zipfile
+            from datetime import datetime
+            
+            # Default filename with timestamp
+            if not filepath:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filepath = f"mac_personalization_backup_{timestamp}"
+            
+            # Create backup directory
+            backup_dir = Path(f"{filepath}_temp")
+            backup_dir.mkdir(exist_ok=True)
+            
+            # Copy all user data files
+            user_data_dir = Path("user_data")
+            if user_data_dir.exists():
+                shutil.copytree(user_data_dir, backup_dir / "user_data", dirs_exist_ok=True)
+            
+            # Export custom commands
+            commands_file = backup_dir / "custom_commands_export.json"
+            self.custom_commands.export_commands(str(commands_file))
+            
+            # Create summary file
+            summary = {
+                "export_date": datetime.now().isoformat(),
+                "user_name": self.user_profile.get_name(),
+                "total_interactions": self.interaction_count,
+                "conversation_count": len(self.user_profile.conversations),
+                "custom_commands": len(self.custom_commands.commands),
+                "active_reminders": len(self.user_profile.get_active_reminders()),
+                "notes_count": len(self.user_profile.memory["notes"]),
+                "version": "MAC Assistant v2.0.0"
+            }
+            
+            with open(backup_dir / "export_summary.json", 'w') as f:
+                json.dump(summary, f, indent=2)
+            
+            # Create zip file
+            zip_path = f"{filepath}.zip"
+            with zipfile.ZipFile(zip_path, 'w') as zipf:
+                for file_path in backup_dir.rglob('*'):
+                    if file_path.is_file():
+                        arcname = file_path.relative_to(backup_dir)
+                        zipf.write(file_path, arcname)
+            
+            # Clean up temp directory
+            shutil.rmtree(backup_dir)
+            
+            return {
+                "status": "success",
+                "message": f"✅ Personalization data exported to {zip_path}",
+                "filepath": zip_path,
+                "summary": summary
+            }
+            
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"❌ Error exporting data: {e}"
+            }
+    
     # ========== EXISTING API METHODS ==========
+    
+    def get_ai_status(self) -> Dict[str, bool]:
+        """Return AI services status."""
+        return {
+            'gemini_available': self.ai_services.is_gemini_available(),
+        }
     
     def get_available_commands(self) -> Dict[str, list]:
         """Return available command patterns."""

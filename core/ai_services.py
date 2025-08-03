@@ -37,6 +37,10 @@ class AIServices:
         """Check if AI service is available."""
         return self.gemini_model is not None
     
+    def is_gemini_available(self):
+        """Check if Gemini AI is available."""
+        return self.gemini_model is not None
+    
     def ask_ai(self, question: str, context: str = "") -> Dict[str, Any]:
         """
         Ask AI (Gemini) for intelligent responses.

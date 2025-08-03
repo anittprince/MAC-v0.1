@@ -157,15 +157,35 @@ class MACAssistant:
             self.is_running = False
     
     def _process_voice_command(self, command_text: str):
-        """Process a voice command and speak the response."""
+        """Process a voice command with personalization and speak the response."""
         try:
-            # Process command through brain
+            # Handle special personalization commands first
+            if self._handle_special_commands(command_text):
+                return
+            
+            # Process command through enhanced brain
             result = self.brain.process_command(command_text)
             
-            # Speak the response
+            # Get enhanced response with mood context
             response_text = result.get('message', 'I could not process that command')
-            print(f"MAC: {response_text}")
-            self.voice_output.speak(response_text)
+            enhanced_response = self.contextual_response.enhance_response_for_speech(
+                response_text, 
+                command_text
+            )
+            
+            print(f"MAC: {enhanced_response}")
+            self.voice_output.speak(enhanced_response)
+            
+            # Handle personalized response enhancements
+            if result.get('suggestions'):
+                suggestions_text = "I also suggest: " + ", ".join(result['suggestions'][:2])
+                print(f"💡 {suggestions_text}")
+                self.voice_output.speak(suggestions_text)
+            
+            if result.get('reminders'):
+                reminders_text = "Reminder: " + result['reminders'][0]
+                print(f"⏰ {reminders_text}")
+                self.voice_output.speak(reminders_text)
             
             # Print additional data if available
             if result.get('data'):
@@ -175,20 +195,46 @@ class MACAssistant:
             error_msg = f"Error processing command: {str(e)}"
             print(f"MAC: {error_msg}")
             self.voice_output.speak("I encountered an error processing your command.")
+            
+            # Log error for learning purposes
+            try:
+                self.brain.learning_engine.log_error_pattern(str(e), command_text)
+            except:
+                pass
     
     def _process_text_command(self, command_text: str):
-        """Process a text command and print the response."""
+        """Process a text command with personalization and print the response."""
         try:
-            # Process command through brain
+            # Handle special personalization commands first
+            if self._handle_special_commands(command_text):
+                return
+            
+            # Process command through enhanced brain
             result = self.brain.process_command(command_text)
             
             # Print the response
             response_text = result.get('message', 'I could not process that command')
             print(f"MAC: {response_text}")
             
+            # Handle personalized response enhancements
+            if result.get('suggestions'):
+                print("\n💡 Suggestions:")
+                for suggestion in result['suggestions'][:3]:
+                    print(f"   • {suggestion}")
+            
+            if result.get('reminders'):
+                print("\n⏰ Related reminders:")
+                for reminder in result['reminders'][:2]:
+                    print(f"   • {reminder}")
+            
             # Speak the response if speech is enabled
             if hasattr(self, 'speech_enabled') and self.speech_enabled:
-                self.voice_output.speak(response_text)
+                # Use enhanced response with mood context
+                enhanced_response = self.contextual_response.enhance_response_for_speech(
+                    response_text, 
+                    command_text
+                )
+                self.voice_output.speak(enhanced_response)
             
             # Print additional data if available
             if result.get('data'):
@@ -199,6 +245,12 @@ class MACAssistant:
             print(f"MAC: {error_msg}")
             if hasattr(self, 'speech_enabled') and self.speech_enabled:
                 self.voice_output.speak("I encountered an error processing your command.")
+            
+            # Log error for learning purposes
+            try:
+                self.brain.learning_engine.log_error_pattern(str(e), command_text)
+            except:
+                pass
     
     def process_single_command(self, command_text: str) -> dict:
         """Process a single command and return the result."""
@@ -339,6 +391,10 @@ class MACAssistant:
         
         elif command_lower in ['mood', 'how am i feeling']:
             self._analyze_current_mood()
+            return True
+        
+        elif command_lower.startswith('export') and ('data' in command_lower or 'backup' in command_lower):
+            self._handle_export_data()
             return True
         
         return False
@@ -546,6 +602,31 @@ class MACAssistant:
             
         except Exception as e:
             print(f"Error checking notifications: {e}")
+    
+    def _handle_export_data(self):
+        """Handle data export request."""
+        try:
+            print("\n💾 Exporting your personalization data...")
+            result = self.brain.export_personalization_data()
+            
+            if result['status'] == 'success':
+                print(f"✅ {result['message']}")
+                
+                summary = result['summary']
+                print(f"\n📋 Export Summary:")
+                print(f"   • User: {summary['user_name']}")
+                print(f"   • Total interactions: {summary['total_interactions']}")
+                print(f"   • Conversations: {summary['conversation_count']}")
+                print(f"   • Custom commands: {summary['custom_commands']}")
+                print(f"   • Active reminders: {summary['active_reminders']}")
+                print(f"   • Notes: {summary['notes_count']}")
+                print(f"   • Export date: {summary['export_date'][:16]}")
+                
+            else:
+                print(f"❌ {result['message']}")
+                
+        except Exception as e:
+            print(f"❌ Error exporting data: {e}")
     
     def run(self):
         """Run the main assistant loop with enhanced personalization features."""

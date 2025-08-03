@@ -528,12 +528,38 @@ class PersonalAssistant:
     
     def _handle_set_preference(self, command: str) -> Dict[str, Any]:
         """Handle setting preferences."""
-        # This is a simplified implementation
-        # In practice, you'd want more sophisticated parsing
+        text = command.lower()
+        
+        # Parse common preference patterns
+        if "units to metric" in text or "use metric" in text:
+            self.user_profile.set_preference("units", "metric")
+            return {"status": "success", "message": "Units set to metric system."}
+        elif "units to imperial" in text or "use imperial" in text:
+            self.user_profile.set_preference("units", "imperial")
+            return {"status": "success", "message": "Units set to imperial system."}
+        elif "time format to 24" in text or "24 hour" in text:
+            self.user_profile.set_preference("time_format", "24h")
+            return {"status": "success", "message": "Time format set to 24-hour."}
+        elif "time format to 12" in text or "12 hour" in text:
+            self.user_profile.set_preference("time_format", "12h")
+            return {"status": "success", "message": "Time format set to 12-hour."}
+        elif "response style" in text:
+            if "formal" in text:
+                self.user_profile.profile["voice_settings"]["response_style"] = "formal"
+                self.user_profile._save_profile()
+                return {"status": "success", "message": "Response style set to formal."}
+            elif "casual" in text:
+                self.user_profile.profile["voice_settings"]["response_style"] = "casual"
+                self.user_profile._save_profile()
+                return {"status": "success", "message": "Response style set to casual."}
+            elif "friendly" in text:
+                self.user_profile.profile["voice_settings"]["response_style"] = "friendly"
+                self.user_profile._save_profile()
+                return {"status": "success", "message": "Response style set to friendly."}
         
         return {
-            "status": "success", 
-            "message": "Preference settings not fully implemented yet. You can manually edit your profile."
+            "status": "info", 
+            "message": "Try: 'set units to metric', 'set time format to 24 hour', 'set response style to friendly'"
         }
     
     def _handle_set_name(self, command: str) -> Dict[str, Any]:

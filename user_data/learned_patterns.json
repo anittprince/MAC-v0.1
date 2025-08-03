@@ -1,7 +1,13 @@
 {
-  "command_sequences": {},
+  "command_sequences": {
+    "question -> general": 1,
+    "general -> general": 2
+  },
   "time_patterns": {
     "general": {
+      "night": 4
+    },
+    "question": {
       "night": 1
     }
   },
@@ -14,12 +20,40 @@
     },
     "who": {
       "general": 1
+    },
+    "make": {
+      "question": 1
+    },
+    "coil": {
+      "question": 1
+    },
+    "tesla": {
+      "question": 1
+    },
+    "how": {
+      "question": 1
+    },
+    "way": {
+      "general": 1
+    },
+    "easy": {
+      "general": 1
+    },
+    "yes": {
+      "general": 1
+    },
+    "give": {
+      "general": 1
+    },
+    "oaky,": {
+      "general": 1
     }
   },
   "response_preferences": {},
   "error_patterns": {},
   "success_patterns": {
-    "general_casual_medium": 1
+    "general_casual_medium": 4,
+    "question_casual_medium": 1
   },
   "custom_workflows": {}
 }
