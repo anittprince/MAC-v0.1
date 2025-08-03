@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Models
+models/
+*.model
+*.zip
+
+# Logs
+*.log
+logs/
+
+# Configuration
+config.ini
+settings.json
+.env
+
+# Android
+android/MACAssistant/.gradle/
+android/MACAssistant/build/
+android/MACAssistant/local.properties
+android/MACAssistant/.idea/
+android/MACAssistant/app/build/
+*.apk
+*.aab
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
