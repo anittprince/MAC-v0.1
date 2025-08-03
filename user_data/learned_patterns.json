@@ -5,7 +5,7 @@
   },
   "time_patterns": {
     "general": {
-      "night": 4
+      "night": 5
     },
     "question": {
       "night": 1
@@ -47,12 +47,15 @@
     },
     "oaky,": {
       "general": 1
+    },
+    "hello": {
+      "general": 1
     }
   },
   "response_preferences": {},
   "error_patterns": {},
   "success_patterns": {
-    "general_casual_medium": 4,
+    "general_casual_medium": 5,
     "question_casual_medium": 1
   },
   "custom_workflows": {}

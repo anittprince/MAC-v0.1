@@ -1,0 +1,23 @@
+{
+  "weather": {
+    "api_key": "",
+    "default_city": "New York",
+    "units": "metric"
+  },
+  "news": {
+    "api_key": "",
+    "default_sources": [
+      "bbc-news",
+      "reuters",
+      "associated-press"
+    ],
+    "default_category": "general"
+  },
+  "email": {
+    "smtp_server": "",
+    "smtp_port": 587,
+    "username": "",
+    "password": "",
+    "use_tls": true
+  }
+}

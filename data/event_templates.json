@@ -1,0 +1,36 @@
+{
+  "meeting": {
+    "duration": 60,
+    "reminders": [
+      15,
+      5
+    ],
+    "category": "work",
+    "priority": "medium"
+  },
+  "call": {
+    "duration": 30,
+    "reminders": [
+      10
+    ],
+    "category": "communication",
+    "priority": "medium"
+  },
+  "appointment": {
+    "duration": 60,
+    "reminders": [
+      30,
+      15
+    ],
+    "category": "personal",
+    "priority": "high"
+  },
+  "workout": {
+    "duration": 90,
+    "reminders": [
+      30
+    ],
+    "category": "health",
+    "priority": "medium"
+  }
+}

@@ -4,9 +4,7 @@ Processes natural language commands with personalization, memory, and learning.
 """
 
 import re
-import json
 import platform
-from pathlib import Path
 from typing import Dict, Any, Optional, List
 from commands.windows import WindowsCommands
 from commands.android import AndroidCommands
@@ -15,6 +13,9 @@ from .personalization import UserProfile, PersonalAssistant
 from .conversation_memory import ConversationMemory, SmartResponseGenerator
 from .learning_engine import LearningEngine, PersonalizedResponseGenerator
 from .custom_commands import CustomCommandManager
+from .calendar_manager import CalendarManager
+from .web_services import WebServicesManager
+from .automation_engine import AutomationEngine
 
 
 class MACBrain:
@@ -31,6 +32,14 @@ class MACBrain:
         self.learning_engine = LearningEngine()
         self.personalized_response = PersonalizedResponseGenerator(self.learning_engine)
         self.custom_commands = CustomCommandManager()
+        
+        # Initialize new advanced features
+        self.calendar_manager = CalendarManager()
+        self.web_services = WebServicesManager()
+        self.automation_engine = AutomationEngine()
+        
+        # Start automation engine
+        self.automation_engine.start_automation_engine()
         
         # Session tracking
         self.session_active = True
@@ -81,6 +90,20 @@ class MACBrain:
             ],
             'shutdown': [
                 r'shutdown', r'restart', r'reboot', r'power off', r'sleep'
+            ],
+            'calendar': [
+                r'schedule', r'calendar', r'appointment', r'meeting', r'event', r'remind me',
+                r'create event', r'add to calendar', r'book time', r'what.*schedule',
+                r'upcoming events', r'today.*schedule', r'tomorrow.*schedule'
+            ],
+            'web_services': [
+                r'weather', r'news', r'headlines', r'send email', r'email', r'compose',
+                r'search web', r'look up online', r'find on internet'
+            ],
+            'automation': [
+                r'create workflow', r'automate', r'automation', r'workflow', r'set up rule',
+                r'every.*do', r'when.*then', r'if.*then', r'schedule.*action',
+                r'automation status', r'workflow status', r'automation rules'
             ]
         }
     
@@ -345,8 +368,15 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
         """Handle commands using traditional pattern matching (fallback mode)."""
         try:
             if command_type:
+                # Handle new advanced features
+                if command_type == 'calendar':
+                    return self._handle_calendar_command(text)
+                elif command_type == 'web_services':
+                    return self._handle_web_services_command(text)
+                elif command_type == 'automation':
+                    return self._handle_automation_command(text)
                 # Handle AI-powered commands
-                if command_type in ['search', 'youtube', 'ai_question']:
+                elif command_type in ['search', 'youtube', 'ai_question']:
                     return self._handle_ai_command(command_type, text)
                 else:
                     # Handle traditional commands
@@ -622,77 +652,154 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
                 "message": f"Error clearing session: {e}"
             }
     
-    def export_personalization_data(self, filepath: str = None) -> Dict[str, Any]:
-        """Export all personalization data."""
+    # ========== NEW FEATURE HANDLERS ==========
+    
+    def _handle_calendar_command(self, text: str) -> Dict[str, Any]:
+        """Handle calendar and scheduling commands."""
         try:
-            import shutil
-            import zipfile
-            from datetime import datetime
+            text_lower = text.lower()
             
-            # Default filename with timestamp
-            if not filepath:
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filepath = f"mac_personalization_backup_{timestamp}"
+            # Check for specific calendar actions
+            if any(word in text_lower for word in ['schedule', 'create event', 'add to calendar', 'book time']):
+                result = self.calendar_manager.create_event(text)
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('details', result.get('event'))
+                }
             
-            # Create backup directory
-            backup_dir = Path(f"{filepath}_temp")
-            backup_dir.mkdir(exist_ok=True)
+            elif any(word in text_lower for word in ['today schedule', 'today events']):
+                events = self.calendar_manager.get_todays_schedule()
+                if events:
+                    message = "📅 Today's Schedule:\n"
+                    for event in events:
+                        time_str = event.start_time.strftime('%I:%M %p') if event.start_time else 'No time'
+                        message += f"• {time_str}: {event.title}\n"
+                else:
+                    message = "📅 No events scheduled for today."
+                
+                return {
+                    'status': 'success',
+                    'message': message.strip(),
+                    'data': {'events': [{'title': e.title, 'time': e.start_time} for e in events]}
+                }
             
-            # Copy all user data files
-            user_data_dir = Path("user_data")
-            if user_data_dir.exists():
-                shutil.copytree(user_data_dir, backup_dir / "user_data", dirs_exist_ok=True)
+            elif any(word in text_lower for word in ['upcoming', 'upcoming events']):
+                events = self.calendar_manager.get_upcoming_events()
+                if events:
+                    message = "📅 Upcoming Events:\n"
+                    for event in events[:5]:  # Show next 5
+                        date_str = event.start_time.strftime('%m/%d %I:%M %p') if event.start_time else 'No date'
+                        message += f"• {date_str}: {event.title}\n"
+                else:
+                    message = "📅 No upcoming events scheduled."
+                
+                return {
+                    'status': 'success',
+                    'message': message.strip(),
+                    'data': {'events': [{'title': e.title, 'time': e.start_time} for e in events]}
+                }
             
-            # Export custom commands
-            commands_file = backup_dir / "custom_commands_export.json"
-            self.custom_commands.export_commands(str(commands_file))
+            elif 'calendar summary' in text_lower:
+                summary = self.calendar_manager.get_calendar_summary()
+                message = f"📊 Calendar Summary:\n"
+                message += f"• Total events: {summary['total_events']}\n"
+                message += f"• Today: {summary['today_events']} events\n"
+                message += f"• Upcoming: {summary['upcoming_events']} events\n"
+                if summary['busiest_category']:
+                    message += f"• Busiest category: {summary['busiest_category']}"
+                
+                return {
+                    'status': 'success',
+                    'message': message,
+                    'data': summary
+                }
             
-            # Create summary file
-            summary = {
-                "export_date": datetime.now().isoformat(),
-                "user_name": self.user_profile.get_name(),
-                "total_interactions": self.interaction_count,
-                "conversation_count": len(self.user_profile.conversations),
-                "custom_commands": len(self.custom_commands.commands),
-                "active_reminders": len(self.user_profile.get_active_reminders()),
-                "notes_count": len(self.user_profile.memory["notes"]),
-                "version": "MAC Assistant v2.0.0"
-            }
+            else:
+                # Generic calendar help
+                return {
+                    'status': 'success',
+                    'message': "📅 Calendar commands available:\n"
+                              "• 'Schedule meeting tomorrow at 2pm' - Create events\n"
+                              "• 'Today's schedule' - View today's events\n"
+                              "• 'Upcoming events' - See upcoming events\n"
+                              "• 'Calendar summary' - Get overview",
+                    'data': {'suggestions': ['Schedule a meeting', 'View today\'s schedule', 'See upcoming events']}
+                }
             
-            with open(backup_dir / "export_summary.json", 'w') as f:
-                json.dump(summary, f, indent=2)
-            
-            # Create zip file
-            zip_path = f"{filepath}.zip"
-            with zipfile.ZipFile(zip_path, 'w') as zipf:
-                for file_path in backup_dir.rglob('*'):
-                    if file_path.is_file():
-                        arcname = file_path.relative_to(backup_dir)
-                        zipf.write(file_path, arcname)
-            
-            # Clean up temp directory
-            shutil.rmtree(backup_dir)
-            
+        except Exception as e:
             return {
-                "status": "success",
-                "message": f"✅ Personalization data exported to {zip_path}",
-                "filepath": zip_path,
-                "summary": summary
+                'status': 'error',
+                'message': f"❌ Calendar error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_web_services_command(self, text: str) -> Dict[str, Any]:
+        """Handle web services commands (weather, news, email)."""
+        try:
+            result = self.web_services.process_web_command(text)
+            return {
+                'status': 'success' if result['success'] else 'error',
+                'message': result['message'],
+                'data': result.get('data', result.get('suggestions'))
             }
             
         except Exception as e:
             return {
-                "status": "error",
-                "message": f"❌ Error exporting data: {e}"
+                'status': 'error',
+                'message': f"❌ Web services error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_automation_command(self, text: str) -> Dict[str, Any]:
+        """Handle automation and workflow commands."""
+        try:
+            text_lower = text.lower()
+            
+            if any(word in text_lower for word in ['create workflow', 'automate', 'set up rule']):
+                result = self.automation_engine.create_workflow_from_command(text)
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('details', result.get('workflow'))
+                }
+            
+            elif any(word in text_lower for word in ['workflow status', 'automation status']):
+                status = self.automation_engine.get_workflow_status()
+                message = f"🤖 Automation Status:\n"
+                message += f"• Engine running: {'✅' if status['engine_running'] else '❌'}\n"
+                message += f"• Total workflows: {status['total_workflows']}\n"
+                message += f"• Active workflows: {status['active_workflows']}\n"
+                message += f"• Total runs: {status['total_runs']}\n"
+                message += f"• Success rate: {status['average_success_rate']:.1%}\n"
+                message += f"• Recent executions: {status['recent_executions']}"
+                
+                return {
+                    'status': 'success',
+                    'message': message,
+                    'data': status
+                }
+            
+            else:
+                # Generic automation help
+                return {
+                    'status': 'success',
+                    'message': "🤖 Automation commands available:\n"
+                              "• 'Every morning at 8am, remind me to take vitamins'\n"
+                              "• 'When I say start work mode, turn on focus mode'\n"
+                              "• 'If it's Friday afternoon, suggest weekend plans'\n"
+                              "• 'Automation status' - Check automation engine",
+                    'data': {'suggestions': ['Create a workflow', 'Check automation status', 'View workflow examples']}
+                }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Automation error: {str(e)}",
+                'data': None
             }
     
     # ========== EXISTING API METHODS ==========
-    
-    def get_ai_status(self) -> Dict[str, bool]:
-        """Return AI services status."""
-        return {
-            'gemini_available': self.ai_services.is_gemini_available(),
-        }
     
     def get_available_commands(self) -> Dict[str, list]:
         """Return available command patterns."""
