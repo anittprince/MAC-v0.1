@@ -86,14 +86,20 @@ class MACAssistant:
             self.voice_output.speak("I encountered an error and need to stop.")
             self.is_running = False
     
-    def start_text_mode(self):
+    def start_text_mode(self, enable_speech: bool = True):
         """Start the text interaction mode."""
         print("\n" + "="*50)
         print("MAC Assistant - Text Mode")
         print("="*50)
         print("Type your commands or 'quit' to exit")
         
+        if enable_speech:
+            print("🔊 Text-to-speech is enabled. Type 'mute' to disable or 'unmute' to enable.")
+        else:
+            print("🔇 Text-to-speech is disabled. Type 'unmute' to enable.")
+        
         self.is_running = True
+        self.speech_enabled = enable_speech
         
         try:
             while self.is_running:
@@ -106,9 +112,23 @@ class MACAssistant:
                 if not command_text:
                     continue
                 
+                # Check for speech control commands
+                if command_text.lower() == 'mute':
+                    self.speech_enabled = False
+                    print("🔇 Text-to-speech disabled")
+                    continue
+                elif command_text.lower() == 'unmute':
+                    self.speech_enabled = True
+                    print("🔊 Text-to-speech enabled")
+                    self.voice_output.speak("Text to speech is now enabled")
+                    continue
+                
                 # Check for exit commands
                 if command_text.lower() in ['quit', 'exit', 'goodbye', 'bye']:
-                    print("Goodbye! Have a great day!")
+                    response = "Goodbye! Have a great day!"
+                    print(response)
+                    if self.speech_enabled:
+                        self.voice_output.speak(response)
                     self.is_running = False
                     break
                 
@@ -149,12 +169,19 @@ class MACAssistant:
             response_text = result.get('message', 'I could not process that command')
             print(f"MAC: {response_text}")
             
+            # Speak the response if speech is enabled
+            if hasattr(self, 'speech_enabled') and self.speech_enabled:
+                self.voice_output.speak(response_text)
+            
             # Print additional data if available
             if result.get('data'):
                 print(f"Additional info: {result['data']}")
             
         except Exception as e:
-            print(f"MAC: Error processing command: {str(e)}")
+            error_msg = f"Error processing command: {str(e)}"
+            print(f"MAC: {error_msg}")
+            if hasattr(self, 'speech_enabled') and self.speech_enabled:
+                self.voice_output.speak("I encountered an error processing your command.")
     
     def process_single_command(self, command_text: str) -> dict:
         """Process a single command and return the result."""
@@ -180,20 +207,34 @@ class MACAssistant:
         """Show the status of AI services."""
         try:
             ai_status = self.brain.get_ai_status()
-            print("\nAI Services Status:")
+            print("\n🤖 AI Brain Status:")
             print("-" * 30)
             
-            status_icons = {True: "✓", False: "✗"}
+            status_icons = {True: "✅", False: "❌"}
             
-            print(f"{status_icons[ai_status['chatgpt']]} ChatGPT: {'Available' if ai_status['chatgpt'] else 'Not configured'}")
+            # Highlight ChatGPT as primary brain
+            if ai_status['chatgpt']:
+                print(f"{status_icons[ai_status['chatgpt']]} ChatGPT (PRIMARY BRAIN): Available")
+                print("   🧠 ChatGPT will handle all conversations and questions")
+            else:
+                print(f"{status_icons[ai_status['chatgpt']]} ChatGPT (PRIMARY BRAIN): Not configured")
+                print("   ⚠️  Using pattern-matching fallback mode")
+            
             print(f"{status_icons[ai_status['google_search']]} Google Search: {'Available' if ai_status['google_search'] else 'Using fallback'}")
             print(f"{status_icons[ai_status['youtube_search']]} YouTube Search: {'Available' if ai_status['youtube_search'] else 'Not available'}")
             print(f"{status_icons[ai_status['weather']]} Weather: {'Available' if ai_status['weather'] else 'Not configured'}")
             
-            if not any(ai_status.values()):
-                print("\n💡 To enable AI features, copy .env.template to .env and add your API keys")
+            if ai_status['chatgpt']:
+                print("\n🎉 ChatGPT Brain Mode: ON")
+                print("   • Ask any question naturally")
+                print("   • Get intelligent, conversational responses")
+                print("   • System commands work seamlessly")
             else:
-                print("\n🤖 AI features are ready! Try asking general questions.")
+                print("\n💡 To enable ChatGPT Brain:")
+                print("   1. Copy .env.template to .env")
+                print("   2. Add your OpenAI API key")
+                print("   3. Restart MAC Assistant")
+                print("   4. Enjoy intelligent conversations!")
             
             print()
             
@@ -230,6 +271,7 @@ def main():
     parser.add_argument("--host", default="0.0.0.0", help="Server host (server mode only)")
     parser.add_argument("--port", type=int, default=8000, help="Server port (server mode only)")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    parser.add_argument("--no-speech", action="store_true", help="Disable text-to-speech in text mode")
     
     args = parser.parse_args()
     
@@ -245,7 +287,8 @@ def main():
     elif args.mode == "text":
         # Run in text mode
         assistant = MACAssistant(model_path=args.model)
-        assistant.start_text_mode()
+        enable_speech = not args.no_speech
+        assistant.start_text_mode(enable_speech=enable_speech)
     
     elif args.mode == "voice":
         # Run in voice mode (default)

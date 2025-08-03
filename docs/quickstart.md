@@ -46,8 +46,31 @@ You should see:
 
 ## First Run
 
-### Start Voice Mode
+### Start Voice Mode (Recommended)
 ```bash
+python main.py --mode voice
+```
+
+### Start Text Mode with TTS
+```bash
+python main.py --mode text
+```
+
+**Text Mode Features:**
+- 🔊 **Text-to-Speech**: Responses are both printed AND spoken
+- 💬 **Interactive Commands**: Type `mute` to disable TTS, `unmute` to enable
+- ⌨️ **Keyboard Input**: Type commands instead of speaking them
+- 🔇 **Silent Mode**: Use `--no-speech` flag to disable TTS completely
+
+### Start Text Mode (Silent)
+```bash
+python main.py --mode text --no-speech
+```
+
+### Start API Server Mode
+```bash
+python main.py --mode server
+```
 python main.py --mode voice
 ```
 

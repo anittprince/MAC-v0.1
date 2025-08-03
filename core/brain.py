@@ -57,7 +57,8 @@ class MACBrain:
             'volume': [
                 r'volume up', r'volume down', r'mute', r'unmute', r'set volume',
                 r'increase volume', r'decrease volume', r'turn up volume', r'turn down volume',
-                r'what is the volume', r'current volume', r'volume status', r'sound up', r'sound down'
+                r'what is the volume', r'current volume', r'volume status', r'sound up', r'sound down',
+                r'turn up.*volume', r'turn down.*volume', r'raise.*volume', r'lower.*volume'
             ],
             'shutdown': [
                 r'shutdown', r'restart', r'reboot', r'power off', r'sleep'
@@ -77,6 +78,7 @@ class MACBrain:
     def process_command(self, text: str) -> Dict[str, Any]:
         """
         Process a text command and return appropriate response.
+        ChatGPT is now the primary brain with system commands as fallbacks.
         
         Args:
             text (str): The command text to process
@@ -91,27 +93,24 @@ class MACBrain:
                 'data': None
             }
         
+        original_text = text.strip()
         text = text.lower().strip()
         
         try:
-            # Match command to pattern
+            # First, check if this is a critical system command that should bypass ChatGPT
+            critical_commands = self._get_critical_commands()
             command_type = self._identify_command_type(text)
             
-            if command_type:
-                # Handle AI-powered commands
-                if command_type in ['search', 'youtube', 'ai_question']:
-                    return self._handle_ai_command(command_type, text)
-                else:
-                    # Handle traditional commands
-                    result = self._execute_command(command_type, text)
-                    return {
-                        'status': 'success',
-                        'message': result.get('message', 'Command executed successfully'),
-                        'data': result.get('data', None)
-                    }
+            if command_type in critical_commands:
+                # Handle critical system commands directly (volume, shutdown, etc.)
+                return self._handle_system_command(command_type, text)
+            
+            # For all other commands, try ChatGPT first
+            if self.ai_services.is_available()['chatgpt']:
+                return self._handle_chatgpt_primary(original_text, command_type, text)
             else:
-                # If no pattern matches, try AI fallback
-                return self._handle_ai_fallback(text)
+                # Fallback to traditional pattern matching if ChatGPT unavailable
+                return self._handle_traditional_processing(command_type, text)
                 
         except Exception as e:
             return {
@@ -319,3 +318,133 @@ class MACBrain:
     def get_ai_status(self) -> Dict[str, bool]:
         """Get the status of AI services."""
         return self.ai_services.is_available()
+    
+    def _get_critical_commands(self) -> list:
+        """Get list of critical system commands that should bypass ChatGPT."""
+        return ['volume', 'shutdown', 'system_info']
+    
+    def _handle_chatgpt_primary(self, original_text: str, command_type: str, lower_text: str) -> Dict[str, Any]:
+        """Handle command with ChatGPT as primary processor."""
+        try:
+            # Create context for ChatGPT about available system functions
+            system_context = self._build_system_context(command_type)
+            
+            # Ask ChatGPT to process the command
+            result = self.ai_services.ask_chatgpt(original_text, system_context)
+            
+            if result['success']:
+                # Check if ChatGPT indicated this needs system function execution
+                response_data = result.get('data', {})
+                
+                # If ChatGPT suggests a system command, execute it
+                if command_type and self._should_execute_system_command(result['message'], command_type):
+                    system_result = self._execute_command(command_type, lower_text)
+                    
+                    # Combine ChatGPT response with system execution
+                    combined_message = f"{result['message']}\n\nSystem: {system_result.get('message', 'Command executed')}"
+                    
+                    return {
+                        'status': 'success',
+                        'message': combined_message,
+                        'data': {
+                            'chatgpt_response': result['message'],
+                            'system_result': system_result.get('data'),
+                            'source': 'ChatGPT + System'
+                        }
+                    }
+                else:
+                    # Pure ChatGPT response
+                    return {
+                        'status': 'success',
+                        'message': result['message'],
+                        'data': {
+                            'source': 'ChatGPT',
+                            'tokens_used': response_data.get('tokens_used', 0)
+                        }
+                    }
+            else:
+                # ChatGPT failed, fallback to traditional processing
+                return self._handle_traditional_processing(command_type, lower_text)
+                
+        except Exception as e:
+            # Error with ChatGPT, fallback to traditional processing
+            return self._handle_traditional_processing(command_type, lower_text)
+    
+    def _build_system_context(self, command_type: str) -> str:
+        """Build context for ChatGPT about available system functions."""
+        context = """You are MAC, a voice assistant with access to system functions. 
+        
+Available system functions:
+- Time queries: Can get current time and date
+- System information: Can check CPU, memory, disk usage
+- Volume control: Can adjust system volume
+- Weather information: Can get weather data (if configured)
+- Web search: Can search for information online
+- YouTube search: Can find videos
+
+Respond naturally and conversationally. If the user asks for system information like time, weather, or wants to control volume, mention that you're checking or adjusting it for them.
+
+Keep responses concise (under 100 words) for voice interaction."""
+        
+        if command_type:
+            context += f"\n\nThe user's request seems related to: {command_type}"
+        
+        return context
+    
+    def _should_execute_system_command(self, chatgpt_response: str, command_type: str) -> bool:
+        """Determine if we should execute a system command based on ChatGPT response and command type."""
+        if not command_type:
+            return False
+            
+        # Always execute these system commands
+        execute_types = ['time', 'weather', 'system_info']
+        
+        if command_type in execute_types:
+            return True
+            
+        # Check if ChatGPT response suggests system execution
+        execution_keywords = ['let me check', 'checking', 'getting', 'finding', 'searching']
+        response_lower = chatgpt_response.lower()
+        
+        return any(keyword in response_lower for keyword in execution_keywords)
+    
+    def _handle_system_command(self, command_type: str, text: str) -> Dict[str, Any]:
+        """Handle critical system commands directly without ChatGPT."""
+        try:
+            result = self._execute_command(command_type, text)
+            return {
+                'status': 'success',
+                'message': result.get('message', 'Command executed successfully'),
+                'data': result.get('data', None)
+            }
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"System command error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_traditional_processing(self, command_type: str, text: str) -> Dict[str, Any]:
+        """Handle commands using traditional pattern matching (fallback mode)."""
+        try:
+            if command_type:
+                # Handle AI-powered commands
+                if command_type in ['search', 'youtube', 'ai_question']:
+                    return self._handle_ai_command(command_type, text)
+                else:
+                    # Handle traditional commands
+                    result = self._execute_command(command_type, text)
+                    return {
+                        'status': 'success',
+                        'message': result.get('message', 'Command executed successfully'),
+                        'data': result.get('data', None)
+                    }
+            else:
+                # If no pattern matches, try AI fallback
+                return self._handle_ai_fallback(text)
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"Processing error: {str(e)}",
+                'data': None
+            }

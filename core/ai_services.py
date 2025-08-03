@@ -46,15 +46,29 @@ class AIServices:
         if not self.openai_client:
             return {
                 'success': False,
-                'message': 'ChatGPT is not available. Please set up your OpenAI API key.',
+                'message': 'ChatGPT is not available. Please set up your OpenAI API key in the .env file.',
                 'data': None
             }
         
         try:
-            # Prepare the prompt
+            # Enhanced system prompt for voice assistant
             system_prompt = f"""
-            You are MAC, a helpful voice assistant. Provide clear, concise, and friendly responses.
-            Keep answers conversational and under 100 words for voice responses.
+            You are MAC, a helpful and friendly voice assistant. You should:
+            
+            1. Be conversational and natural
+            2. Keep responses concise (under 100 words for voice)
+            3. Be helpful and informative
+            4. If asked about system functions (time, weather, volume), acknowledge you're checking them
+            5. For complex questions, provide clear and useful answers
+            6. Maintain a friendly, professional tone
+            
+            Available capabilities:
+            - Answer general questions
+            - Provide information and explanations
+            - Help with calculations and conversions
+            - Assist with planning and advice
+            - Control system functions when requested
+            
             {context}
             """
             
@@ -64,7 +78,7 @@ class AIServices:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": question}
                 ],
-                max_tokens=150,
+                max_tokens=200,  # Increased for better responses
                 temperature=0.7
             )
             
@@ -76,15 +90,17 @@ class AIServices:
                 'data': {
                     'source': 'ChatGPT',
                     'model': 'gpt-3.5-turbo',
-                    'tokens_used': response.usage.total_tokens
+                    'tokens_used': response.usage.total_tokens,
+                    'prompt_tokens': response.usage.prompt_tokens,
+                    'completion_tokens': response.usage.completion_tokens
                 }
             }
             
         except Exception as e:
             return {
                 'success': False,
-                'message': f'Sorry, I encountered an error asking ChatGPT: {str(e)}',
-                'data': None
+                'message': f'I apologize, but I encountered an error processing your request. Error: {str(e)}',
+                'data': {'error': str(e)}
             }
     
     def search_google(self, query: str, num_results: int = 3) -> Dict[str, Any]:
