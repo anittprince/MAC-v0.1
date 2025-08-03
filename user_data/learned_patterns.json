@@ -1,13 +1,24 @@
 {
   "command_sequences": {
-    "question -> general": 1,
-    "general -> general": 2
+    "question -> general": 2,
+    "general -> general": 3,
+    "general -> search": 1,
+    "search -> general": 1,
+    "general -> reminder": 1,
+    "reminder -> general": 1,
+    "general -> question": 1
   },
   "time_patterns": {
     "general": {
-      "night": 5
+      "night": 10
     },
     "question": {
+      "night": 2
+    },
+    "search": {
+      "night": 1
+    },
+    "reminder": {
       "night": 1
     }
   },
@@ -50,13 +61,93 @@
     },
     "hello": {
       "general": 1
+    },
+    "analyze": {
+      "general": 1
+    },
+    "document": {
+      "general": 1
+    },
+    "artificial": {
+      "search": 1
+    },
+    "research": {
+      "search": 1
+    },
+    "intelligence": {
+      "search": 1
+    },
+    "review": {
+      "general": 1
+    },
+    "code": {
+      "general": 1
+    },
+    "schedule": {
+      "reminder": 1
+    },
+    "team": {
+      "reminder": 1
+    },
+    "tomorrow": {
+      "reminder": 1
+    },
+    "meeting": {
+      "reminder": 1
+    },
+    "create": {
+      "general": 1
+    },
+    "project": {
+      "general": 1
+    },
+    "app": {
+      "general": 1
+    },
+    "new": {
+      "general": 1
+    },
+    "mobile": {
+      "general": 1
+    },
+    "room": {
+      "general": 1
+    },
+    "turn": {
+      "general": 1
+    },
+    "lights": {
+      "general": 1
+    },
+    "living": {
+      "general": 1
+    },
+    "show": {
+      "question": 1
+    },
+    "connected": {
+      "question": 1
+    },
+    "devices": {
+      "question": 1
+    },
+    "energy": {
+      "general": 1
+    },
+    "usage": {
+      "general": 1
+    },
+    "optimize": {
+      "general": 1
     }
   },
   "response_preferences": {},
   "error_patterns": {},
   "success_patterns": {
-    "general_casual_medium": 5,
-    "question_casual_medium": 1
+    "general_casual_medium": 10,
+    "question_casual_medium": 2,
+    "search_casual_medium": 1,
+    "reminder_casual_medium": 1
   },
   "custom_workflows": {}
 }

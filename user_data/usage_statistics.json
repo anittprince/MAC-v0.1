@@ -1,17 +1,25 @@
 {
   "daily_usage": {
-    "2025-08-04": 6
+    "2025-08-04": 14
   },
   "hourly_patterns": {
-    "3": 6
+    "3": 14
   },
   "session_lengths": [],
   "command_success_rates": {
     "general": {
-      "success": 5,
-      "total": 5
+      "success": 10,
+      "total": 10
     },
     "question": {
+      "success": 2,
+      "total": 2
+    },
+    "search": {
+      "success": 1,
+      "total": 1
+    },
+    "reminder": {
       "success": 1,
       "total": 1
     }

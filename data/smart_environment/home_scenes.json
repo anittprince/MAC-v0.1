@@ -1,0 +1,28 @@
+{
+  "morning": {
+    "lights": {
+      "living_room": "on",
+      "kitchen": "on"
+    },
+    "temperature": 70,
+    "music": "news_playlist"
+  },
+  "evening": {
+    "lights": {
+      "living_room": "dim",
+      "bedroom": "on"
+    },
+    "temperature": 68,
+    "security": "arm_home"
+  },
+  "away": {
+    "lights": "all_off",
+    "temperature": 65,
+    "security": "arm_away"
+  },
+  "sleep": {
+    "lights": "all_off",
+    "temperature": 66,
+    "security": "night_mode"
+  }
+}

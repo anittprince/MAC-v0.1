@@ -16,6 +16,9 @@ from .custom_commands import CustomCommandManager
 from .calendar_manager import CalendarManager
 from .web_services import WebServicesManager
 from .automation_engine import AutomationEngine
+from .advanced_ai import AdvancedAIModule
+from .enterprise_integration import EnterpriseIntegration
+from .smart_environment import SmartEnvironmentManager
 
 
 class MACBrain:
@@ -38,8 +41,14 @@ class MACBrain:
         self.web_services = WebServicesManager()
         self.automation_engine = AutomationEngine()
         
-        # Start automation engine
+        # Initialize next-generation advanced features
+        self.advanced_ai = AdvancedAIModule()
+        self.enterprise_integration = EnterpriseIntegration()
+        self.smart_environment = SmartEnvironmentManager()
+        
+        # Start automation engines
         self.automation_engine.start_automation_engine()
+        self.smart_environment.start_environmental_monitoring()
         
         # Session tracking
         self.session_active = True
@@ -104,6 +113,26 @@ class MACBrain:
                 r'create workflow', r'automate', r'automation', r'workflow', r'set up rule',
                 r'every.*do', r'when.*then', r'if.*then', r'schedule.*action',
                 r'automation status', r'workflow status', r'automation rules'
+            ],
+            'advanced_ai': [
+                r'analyze document', r'read file', r'summarize document', r'analyze image',
+                r'describe picture', r'review code', r'debug', r'optimize code', r'explain code',
+                r'research', r'investigate', r'deep dive', r'find information about',
+                r'create', r'generate', r'write', r'design'
+            ],
+            'enterprise': [
+                r'meeting', r'team', r'collaborate', r'slack', r'teams',
+                r'project', r'task', r'deadline', r'milestone',
+                r'drive', r'dropbox', r'onedrive', r'cloud', r'sync',
+                r'analytics', r'dashboard', r'metrics', r'report',
+                r'security', r'encrypt', r'backup', r'secure'
+            ],
+            'smart_environment': [
+                r'lights', r'temperature', r'thermostat', r'climate',
+                r'device', r'sensor', r'iot', r'connect',
+                r'optimize', r'automate', r'schedule', r'routine',
+                r'energy', r'power', r'electricity', r'usage',
+                r'security', r'alarm', r'monitor', r'surveillance'
             ]
         }
     
@@ -375,6 +404,13 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
                     return self._handle_web_services_command(text)
                 elif command_type == 'automation':
                     return self._handle_automation_command(text)
+                # Handle next-generation advanced features
+                elif command_type == 'advanced_ai':
+                    return self._handle_advanced_ai_command(text)
+                elif command_type == 'enterprise':
+                    return self._handle_enterprise_command(text)
+                elif command_type == 'smart_environment':
+                    return self._handle_smart_environment_command(text)
                 # Handle AI-powered commands
                 elif command_type in ['search', 'youtube', 'ai_question']:
                     return self._handle_ai_command(command_type, text)
@@ -796,6 +832,75 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
             return {
                 'status': 'error',
                 'message': f"❌ Automation error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_advanced_ai_command(self, text: str) -> Dict[str, Any]:
+        """Handle advanced AI processing commands."""
+        try:
+            # Extract file paths from command if provided
+            # In a real implementation, this would parse file references
+            file_paths = []  # Could extract from text or context
+            
+            result = self.advanced_ai.process_advanced_request(text, file_paths)
+            
+            return {
+                'status': 'success' if result['success'] else 'error',
+                'message': result['message'],
+                'data': result.get('data')
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Advanced AI error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_enterprise_command(self, text: str) -> Dict[str, Any]:
+        """Handle enterprise integration commands."""
+        try:
+            context = {
+                'user_profile': self.user_profile.get_user_info(),
+                'conversation_context': self.conversation_memory.get_recent_context(5)
+            }
+            
+            result = self.enterprise_integration.handle_enterprise_command(text, context)
+            
+            return {
+                'status': 'success' if result['success'] else 'error',
+                'message': result['message'],
+                'data': result.get('data')
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Enterprise feature error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_smart_environment_command(self, text: str) -> Dict[str, Any]:
+        """Handle smart environment and IoT commands."""
+        try:
+            context = {
+                'user_preferences': self.user_profile.get_preferences(),
+                'current_time': self.personal_assistant._get_current_time(),
+                'user_location': 'home'  # Could be dynamic
+            }
+            
+            result = self.smart_environment.handle_smart_environment_command(text, context)
+            
+            return {
+                'status': 'success' if result['success'] else 'error',
+                'message': result['message'],
+                'data': result.get('data')
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Smart environment error: {str(e)}",
                 'data': None
             }
     

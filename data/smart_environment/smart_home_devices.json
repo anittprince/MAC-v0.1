@@ -1,0 +1,62 @@
+{
+  "lights": {
+    "living_room": {
+      "status": "off",
+      "brightness": 0,
+      "color": "white"
+    },
+    "bedroom": {
+      "status": "off",
+      "brightness": 0,
+      "color": "white"
+    },
+    "kitchen": {
+      "status": "off",
+      "brightness": 0,
+      "color": "white"
+    },
+    "office": {
+      "status": "off",
+      "brightness": 0,
+      "color": "white"
+    }
+  },
+  "climate": {
+    "thermostat": {
+      "temperature": 72,
+      "mode": "auto",
+      "status": "on"
+    },
+    "humidity": {
+      "level": 45,
+      "target": 50
+    }
+  },
+  "security": {
+    "doors": {
+      "front": "locked",
+      "back": "locked",
+      "garage": "closed"
+    },
+    "windows": {
+      "living_room": "closed",
+      "bedroom": "closed"
+    },
+    "cameras": {
+      "front_door": "active",
+      "backyard": "active"
+    }
+  },
+  "entertainment": {
+    "tv": {
+      "status": "off",
+      "channel": 1,
+      "volume": 20
+    },
+    "speakers": {
+      "status": "off",
+      "volume": 30,
+      "source": "bluetooth"
+    }
+  }
+}

@@ -27,12 +27,16 @@
   },
   "learning": {
     "command_usage": {
-      "search": 2
+      "search": 2,
+      "advanced_ai": 2,
+      "ai_question": 1,
+      "calendar": 1,
+      "smart_environment": 3
     },
     "correction_history": [],
     "habits": {},
     "frequent_requests": []
   },
   "created_date": "2025-08-04T03:26:17.570137",
-  "last_interaction": "2025-08-04T03:29:55.933717"
+  "last_interaction": "2025-08-04T03:52:40.044700"
 }
