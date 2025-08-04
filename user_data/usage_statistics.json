@@ -1,9 +1,10 @@
 {
   "daily_usage": {
-    "2025-08-04": 14
+    "2025-08-04": 15
   },
   "hourly_patterns": {
-    "3": 14
+    "3": 14,
+    "16": 1
   },
   "session_lengths": [],
   "command_success_rates": {
@@ -20,6 +21,10 @@
       "total": 1
     },
     "reminder": {
+      "success": 1,
+      "total": 1
+    },
+    "weather_query": {
       "success": 1,
       "total": 1
     }

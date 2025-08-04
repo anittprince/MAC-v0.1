@@ -6,7 +6,8 @@
     "search -> general": 1,
     "general -> reminder": 1,
     "reminder -> general": 1,
-    "general -> question": 1
+    "general -> question": 1,
+    "general -> weather_query": 1
   },
   "time_patterns": {
     "general": {
@@ -20,6 +21,9 @@
     },
     "reminder": {
       "night": 1
+    },
+    "weather_query": {
+      "afternoon": 1
     }
   },
   "context_triggers": {
@@ -60,7 +64,7 @@
       "general": 1
     },
     "hello": {
-      "general": 1
+      "general": 2
     },
     "analyze": {
       "general": 1
@@ -139,15 +143,25 @@
     },
     "optimize": {
       "general": 1
+    },
+    "like": {
+      "weather_query": 1
+    },
+    "weather": {
+      "weather_query": 1
+    },
+    "what's": {
+      "weather_query": 1
     }
   },
   "response_preferences": {},
   "error_patterns": {},
   "success_patterns": {
-    "general_casual_medium": 10,
+    "general_casual_medium": 11,
     "question_casual_medium": 2,
     "search_casual_medium": 1,
-    "reminder_casual_medium": 1
+    "reminder_casual_medium": 1,
+    "weather_query_casual_medium": 1
   },
   "custom_workflows": {}
 }

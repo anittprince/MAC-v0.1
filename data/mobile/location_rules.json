@@ -1,0 +1,48 @@
+{
+  "home": {
+    "coordinates": {
+      "lat": 0.0,
+      "lng": 0.0,
+      "radius": 100
+    },
+    "triggers": [
+      {
+        "event": "arrive_home",
+        "actions": [
+          "turn_on_lights",
+          "set_comfortable_temperature"
+        ]
+      },
+      {
+        "event": "leave_home",
+        "actions": [
+          "arm_security",
+          "energy_save_mode"
+        ]
+      }
+    ]
+  },
+  "work": {
+    "coordinates": {
+      "lat": 0.0,
+      "lng": 0.0,
+      "radius": 50
+    },
+    "triggers": [
+      {
+        "event": "arrive_work",
+        "actions": [
+          "work_mode_on",
+          "check_calendar"
+        ]
+      },
+      {
+        "event": "leave_work",
+        "actions": [
+          "work_mode_off",
+          "commute_suggestions"
+        ]
+      }
+    ]
+  }
+}

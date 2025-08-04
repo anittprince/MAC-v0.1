@@ -27,16 +27,22 @@
   },
   "learning": {
     "command_usage": {
-      "search": 2,
+      "search": 4,
       "advanced_ai": 2,
       "ai_question": 1,
       "calendar": 1,
-      "smart_environment": 3
+      "smart_environment": 3,
+      "financial_advisor": 3,
+      "enterprise": 1,
+      "mobile_companion": 3,
+      "multi_language": 2,
+      "weather": 2,
+      "web_dashboard": 1
     },
     "correction_history": [],
     "habits": {},
     "frequent_requests": []
   },
   "created_date": "2025-08-04T03:26:17.570137",
-  "last_interaction": "2025-08-04T03:52:40.044700"
+  "last_interaction": "2025-08-04T16:19:02.294423"
 }

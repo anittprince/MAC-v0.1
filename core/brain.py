@@ -8,6 +8,7 @@ import platform
 from typing import Dict, Any, Optional, List
 from commands.windows import WindowsCommands
 from commands.android import AndroidCommands
+# Clean module imports for JARVIS-level capabilities
 from .ai_services import AIServices
 from .personalization import UserProfile, PersonalAssistant
 from .conversation_memory import ConversationMemory, SmartResponseGenerator
@@ -19,6 +20,11 @@ from .automation_engine import AutomationEngine
 from .advanced_ai import AdvancedAIModule
 from .enterprise_integration import EnterpriseIntegration
 from .smart_environment import SmartEnvironmentManager
+from .mobile_companion import MobileCompanionManager
+from .vision_ai import VisionAIManager
+from .multi_language import MultiLanguageManager
+from .financial_advisor import FinancialAdvisorAgent
+from .web_dashboard import WebDashboardManager
 
 
 class MACBrain:
@@ -45,6 +51,11 @@ class MACBrain:
         self.advanced_ai = AdvancedAIModule()
         self.enterprise_integration = EnterpriseIntegration()
         self.smart_environment = SmartEnvironmentManager()
+        self.mobile_companion = MobileCompanionManager()
+        self.vision_ai = VisionAIManager()
+        self.multi_language = MultiLanguageManager()
+        self.financial_advisor = FinancialAdvisorAgent()
+        self.web_dashboard = WebDashboardManager()
         
         # Start automation engines
         self.automation_engine.start_automation_engine()
@@ -133,6 +144,35 @@ class MACBrain:
                 r'optimize', r'automate', r'schedule', r'routine',
                 r'energy', r'power', r'electricity', r'usage',
                 r'security', r'alarm', r'monitor', r'surveillance'
+            ],
+            'mobile_companion': [
+                r'mobile', r'app', r'sync', r'companion',
+                r'phone', r'pairing', r'connect', r'device',
+                r'cross.*platform', r'notification', r'alert',
+                r'offline', r'location', r'tracking'
+            ],
+            'vision_ai': [
+                r'analyze.*image', r'describe.*image', r'photo',
+                r'extract.*text', r'ocr', r'screenshot',
+                r'detect.*objects', r'visual.*workflow',
+                r'video.*analysis', r'computer.*vision'
+            ],
+            'multi_language': [
+                r'translate', r'translation', r'language',
+                r'speak.*in', r'say.*in', r'convert.*to',
+                r'detect.*language', r'primary.*language',
+                r'supported.*languages', r'localization'
+            ],
+            'financial_advisor': [
+                r'financial', r'money', r'budget', r'expense',
+                r'investment', r'portfolio', r'savings', r'goal',
+                r'stock', r'crypto', r'market', r'wealth',
+                r'retire', r'income', r'debt', r'loan'
+            ],
+            'web_dashboard': [
+                r'dashboard', r'web.*interface', r'remote.*access',
+                r'start.*dashboard', r'stop.*dashboard', r'web.*control',
+                r'browser.*interface', r'dashboard.*status'
             ]
         }
     
@@ -411,6 +451,16 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
                     return self._handle_enterprise_command(text)
                 elif command_type == 'smart_environment':
                     return self._handle_smart_environment_command(text)
+                elif command_type == 'mobile_companion':
+                    return self._handle_mobile_companion_command(text)
+                elif command_type == 'vision_ai':
+                    return self._handle_vision_ai_command(text)
+                elif command_type == 'multi_language':
+                    return self._handle_multi_language_command(text)
+                elif command_type == 'financial_advisor':
+                    return self._handle_financial_advisor_command(text)
+                elif command_type == 'web_dashboard':
+                    return self._handle_web_dashboard_command(text)
                 # Handle AI-powered commands
                 elif command_type in ['search', 'youtube', 'ai_question']:
                     return self._handle_ai_command(command_type, text)
@@ -904,7 +954,462 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
                 'data': None
             }
     
+    def _handle_mobile_companion_command(self, text: str) -> Dict[str, Any]:
+        """Handle mobile companion app commands."""
+        try:
+            context = {
+                'user_profile': self.user_profile.get_user_info(),
+                'current_time': self.personal_assistant._get_current_time()
+            }
+            
+            result = self.mobile_companion.handle_mobile_command(text, context)
+            
+            return {
+                'status': 'success' if result['success'] else 'error',
+                'message': result['message'],
+                'data': result.get('data')
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Mobile companion error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_vision_ai_command(self, text: str) -> Dict[str, Any]:
+        """Handle vision AI and computer vision commands."""
+        try:
+            text_lower = text.lower()
+            
+            # Image analysis commands
+            if any(phrase in text_lower for phrase in ['analyze image', 'describe image', 'analyze photo']):
+                # Extract file path from command
+                import re
+                path_match = re.search(r'["\']([^"\']+)["\']', text)
+                if path_match:
+                    image_path = path_match.group(1)
+                    result = self.vision_ai.analyze_image(image_path)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': '🖼️ Please specify the image path in quotes, e.g., "analyze image \'C:\\path\\to\\image.jpg\'"',
+                        'data': None
+                    }
+            
+            # Screenshot analysis
+            elif any(phrase in text_lower for phrase in ['analyze screenshot', 'screenshot analysis']):
+                result = self.vision_ai.analyze_screenshot()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Video analysis
+            elif any(phrase in text_lower for phrase in ['analyze video', 'video analysis']):
+                path_match = re.search(r'["\']([^"\']+)["\']', text)
+                if path_match:
+                    video_path = path_match.group(1)
+                    result = self.vision_ai.process_video_content(video_path)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': '🎥 Please specify the video path in quotes, e.g., "analyze video \'C:\\path\\to\\video.mp4\'"',
+                        'data': None
+                    }
+            
+            # Vision AI history
+            elif 'vision history' in text_lower or 'analysis history' in text_lower:
+                result = self.vision_ai.get_analysis_history()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            else:
+                # Generic vision AI help
+                return {
+                    'status': 'success',
+                    'message': "🔍 Vision AI commands available:\n"
+                              "• 'Analyze image \"path/to/image.jpg\"' - Analyze any image\n"
+                              "• 'Analyze screenshot' - Analyze current screen\n"
+                              "• 'Analyze video \"path/to/video.mp4\"' - Process video content\n"
+                              "• 'Vision history' - View analysis history",
+                    'data': {
+                        'suggestions': [
+                            'Analyze an image file',
+                            'Take and analyze screenshot',
+                            'Process video content',
+                            'View vision analysis history'
+                        ]
+                    }
+                }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Vision AI error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_multi_language_command(self, text: str) -> Dict[str, Any]:
+        """Handle multi-language and translation commands."""
+        try:
+            text_lower = text.lower()
+            
+            # Translation commands
+            if any(phrase in text_lower for phrase in ['translate', 'translate to', 'convert to']):
+                # Extract translation details using regex
+                import re
+                
+                # Pattern: translate "text" to language
+                translate_match = re.search(r'translate\s+["\']([^"\']+)["\']\s+to\s+(\w+)', text, re.IGNORECASE)
+                if translate_match:
+                    text_to_translate = translate_match.group(1)
+                    target_language = translate_match.group(2).lower()
+                    
+                    result = self.multi_language.translate_text(text_to_translate, target_language)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                
+                # Pattern: translate "text" from source to target
+                translate_from_match = re.search(
+                    r'translate\s+["\']([^"\']+)["\']\s+from\s+(\w+)\s+to\s+(\w+)', 
+                    text, re.IGNORECASE
+                )
+                if translate_from_match:
+                    text_to_translate = translate_from_match.group(1)
+                    source_language = translate_from_match.group(2).lower()
+                    target_language = translate_from_match.group(3).lower()
+                    
+                    result = self.multi_language.translate_text(
+                        text_to_translate, target_language, source_language
+                    )
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                
+                # If no specific pattern, provide help
+                return {
+                    'status': 'error',
+                    'message': '🌍 Translation format: "translate \'text\' to language"\n'
+                              'Examples:\n'
+                              '• "translate \'hello\' to spanish"\n'
+                              '• "translate \'bonjour\' from french to english"',
+                    'data': None
+                }
+            
+            # Language detection
+            elif any(phrase in text_lower for phrase in ['detect language', 'what language']):
+                # Extract text to detect
+                detect_match = re.search(r'["\']([^"\']+)["\']', text)
+                if detect_match:
+                    text_to_detect = detect_match.group(1)
+                    result = self.multi_language.detect_language(text_to_detect)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': '🔍 Format: "detect language \'text to analyze\'"',
+                        'data': None
+                    }
+            
+            # Set primary language
+            elif any(phrase in text_lower for phrase in ['set primary language', 'primary language']):
+                # Extract language
+                lang_match = re.search(r'(?:set primary language|primary language)\s+(?:to\s+)?(\w+)', text, re.IGNORECASE)
+                if lang_match:
+                    language_code = lang_match.group(1).lower()
+                    result = self.multi_language.set_primary_language(language_code)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': '🎯 Format: "set primary language to english"',
+                        'data': None
+                    }
+            
+            # Add secondary language
+            elif any(phrase in text_lower for phrase in ['add language', 'secondary language']):
+                lang_match = re.search(r'(?:add|secondary)\s+language\s+(\w+)', text, re.IGNORECASE)
+                if lang_match:
+                    language_code = lang_match.group(1).lower()
+                    result = self.multi_language.add_secondary_language(language_code)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': '📚 Format: "add language spanish"',
+                        'data': None
+                    }
+            
+            # Language profile
+            elif any(phrase in text_lower for phrase in ['language profile', 'my languages']):
+                result = self.multi_language.get_language_profile()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Supported languages
+            elif any(phrase in text_lower for phrase in ['supported languages', 'available languages']):
+                result = self.multi_language.get_supported_languages()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Translation history
+            elif any(phrase in text_lower for phrase in ['translation history', 'translate history']):
+                result = self.multi_language.get_translation_history()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            else:
+                # Generic multi-language help
+                return {
+                    'status': 'success',
+                    'message': "🌍 Multi-language commands available:\n"
+                              "• 'translate \"text\" to language' - Translate text\n"
+                              "• 'detect language \"text\"' - Detect language\n"
+                              "• 'set primary language spanish' - Set your primary language\n"
+                              "• 'add language french' - Add secondary language\n"
+                              "• 'language profile' - View your language settings\n"
+                              "• 'supported languages' - See all available languages\n"
+                              "• 'translation history' - View recent translations",
+                    'data': {
+                        'suggestions': [
+                            'Translate text to another language',
+                            'Detect language of text',
+                            'Set primary language',
+                            'View supported languages',
+                            'Check language profile'
+                        ]
+                    }
+                }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Multi-language error: {str(e)}",
+                'data': None
+            }
+    
     # ========== EXISTING API METHODS ==========
+    
+    def _handle_financial_advisor_command(self, text: str) -> Dict[str, Any]:
+        """Handle financial advisor and wealth management commands."""
+        try:
+            text_lower = text.lower()
+            
+            # Financial health analysis
+            if any(phrase in text_lower for phrase in ['financial health', 'financial analysis', 'money status']):
+                result = self.financial_advisor.analyze_financial_health()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Expense tracking
+            elif any(phrase in text_lower for phrase in ['track expense', 'add expense', 'spent money']):
+                # Extract amount and description
+                import re
+                
+                # Pattern: track expense $50 for groceries
+                expense_match = re.search(r'(?:track expense|spent|add expense)\s*\$?(\d+(?:\.\d+)?)\s*(?:for|on)?\s*(.+)', text, re.IGNORECASE)
+                if expense_match:
+                    amount = float(expense_match.group(1))
+                    description = expense_match.group(2).strip()
+                    
+                    result = self.financial_advisor.track_expense(amount, description)
+                    return {
+                        'status': 'success' if result['success'] else 'error',
+                        'message': result['message'],
+                        'data': result.get('data')
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': '💰 Format: "track expense $50 for groceries"',
+                        'data': None
+                    }
+            
+            # Investment recommendations
+            elif any(phrase in text_lower for phrase in ['investment recommendation', 'invest money', 'portfolio advice']):
+                # Extract investment parameters
+                import re
+                amount_match = re.search(r'\$?(\d+(?:,\d{3})*(?:\.\d+)?)', text)
+                risk_match = re.search(r'(conservative|moderate|aggressive|speculative)', text, re.IGNORECASE)
+                time_match = re.search(r'(\d+)\s*(?:year|yr)', text, re.IGNORECASE)
+                
+                amount = float(amount_match.group(1).replace(',', '')) if amount_match else 10000.0
+                risk = risk_match.group(1).lower() if risk_match else 'moderate'
+                time_horizon = int(time_match.group(1)) if time_match else 10
+                
+                result = self.financial_advisor.investment_recommendation(risk, amount, time_horizon)
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Budget optimization
+            elif any(phrase in text_lower for phrase in ['budget optimization', 'optimize budget', 'budget analysis']):
+                result = self.financial_advisor.budget_optimization()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Financial goal tracking
+            elif any(phrase in text_lower for phrase in ['financial goal', 'savings goal', 'goal tracking']):
+                # Extract goal name if specified
+                import re
+                goal_match = re.search(r'goal\s+["\']?([^"\']+)["\']?', text, re.IGNORECASE)
+                goal_name = goal_match.group(1).strip() if goal_match else None
+                
+                result = self.financial_advisor.financial_goal_tracking(goal_name)
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Market insights
+            elif any(phrase in text_lower for phrase in ['market insights', 'market analysis', 'market update']):
+                result = self.financial_advisor.market_insights()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            else:
+                # Generic financial advisor help
+                return {
+                    'status': 'success',
+                    'message': "💰 Financial Advisor commands available:\n"
+                              "• 'financial health' - Comprehensive financial analysis\n"
+                              "• 'track expense $50 for groceries' - Track expenses\n"
+                              "• 'investment recommendation $10000 moderate 10 years' - Get investment advice\n"
+                              "• 'budget optimization' - Optimize your spending\n"
+                              "• 'financial goals' - Track savings goals\n"
+                              "• 'market insights' - Current market analysis",
+                    'data': {
+                        'suggestions': [
+                            'Analyze financial health',
+                            'Track an expense',
+                            'Get investment recommendations',
+                            'Optimize budget',
+                            'Check financial goals',
+                            'View market insights'
+                        ]
+                    }
+                }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Financial advisor error: {str(e)}",
+                'data': None
+            }
+    
+    def _handle_web_dashboard_command(self, text: str) -> Dict[str, Any]:
+        """Handle web dashboard and remote access commands."""
+        try:
+            text_lower = text.lower()
+            
+            # Start dashboard
+            if any(phrase in text_lower for phrase in ['start dashboard', 'launch dashboard', 'open dashboard']):
+                result = self.web_dashboard.start_dashboard()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Stop dashboard
+            elif any(phrase in text_lower for phrase in ['stop dashboard', 'close dashboard', 'shut down dashboard']):
+                result = self.web_dashboard.stop_dashboard()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            # Dashboard status
+            elif any(phrase in text_lower for phrase in ['dashboard status', 'dashboard info', 'web interface status']):
+                result = self.web_dashboard.get_dashboard_status()
+                return {
+                    'status': 'success' if result['success'] else 'error',
+                    'message': result['message'],
+                    'data': result.get('data')
+                }
+            
+            else:
+                # Generic dashboard help
+                return {
+                    'status': 'success',
+                    'message': "🌐 Web Dashboard commands available:\n"
+                              "• 'start dashboard' - Launch web interface\n"
+                              "• 'stop dashboard' - Shut down web interface\n"
+                              "• 'dashboard status' - Check dashboard status\n\n"
+                              "Features:\n"
+                              "• Real-time command execution\n"
+                              "• Analytics and monitoring\n"
+                              "• Mobile-responsive design\n"
+                              "• Secure remote access",
+                    'data': {
+                        'suggestions': [
+                            'Start web dashboard',
+                            'Check dashboard status',
+                            'View dashboard features'
+                        ]
+                    }
+                }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f"❌ Web dashboard error: {str(e)}",
+                'data': None
+            }
     
     def get_available_commands(self) -> Dict[str, list]:
         """Return available command patterns."""
