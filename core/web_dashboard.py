@@ -66,7 +66,7 @@ class WebDashboardManager:
                         template_folder=str(self.dashboard_dir / "templates"),
                         static_folder=str(self.dashboard_dir / "static"))
         self.app.secret_key = secrets.token_hex(32)
-        self.socketio = SocketIO(self.app, cors_allowed_origins="*")
+        self.socketio = SocketIO(self.app, cors_allowed_origins="*", async_mode='threading')
         
         # Database and storage
         self.dashboard_db = self.dashboard_dir / "dashboard.db"

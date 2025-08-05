@@ -55,7 +55,13 @@ class MACBrain:
         self.vision_ai = VisionAIManager()
         self.multi_language = MultiLanguageManager()
         self.financial_advisor = FinancialAdvisorAgent()
-        self.web_dashboard = WebDashboardManager()
+        
+        # Web dashboard - temporarily disabled due to SocketIO configuration issues
+        try:
+            self.web_dashboard = WebDashboardManager()
+        except Exception as e:
+            print(f"⚠️  Web dashboard disabled due to error: {e}")
+            self.web_dashboard = None
         
         # Start automation engines
         self.automation_engine.start_automation_engine()
@@ -1353,6 +1359,14 @@ Keep responses concise (under 100 words) for voice interaction unless user prefe
     def _handle_web_dashboard_command(self, text: str) -> Dict[str, Any]:
         """Handle web dashboard and remote access commands."""
         try:
+            # Check if web dashboard is available
+            if not self.web_dashboard:
+                return {
+                    'status': 'error',
+                    'message': '🌐 Web dashboard is currently disabled due to configuration issues. Please check the SocketIO setup.',
+                    'data': None
+                }
+            
             text_lower = text.lower()
             
             # Start dashboard

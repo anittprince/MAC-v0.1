@@ -1,0 +1,56 @@
+{
+  "time_based_suggestions": {
+    "morning": {
+      "time_range": {
+        "start": "06:00",
+        "end": "11:00"
+      },
+      "suggestions": [
+        "Good morning! Would you like me to check today's weather?",
+        "Starting your day! Should I review your schedule?",
+        "Morning! Any reminders you'd like me to set for today?"
+      ]
+    },
+    "afternoon": {
+      "time_range": {
+        "start": "12:00",
+        "end": "17:00"
+      },
+      "suggestions": [
+        "How's your day going? Need help with any work tasks?",
+        "Afternoon check-in! Any updates or questions?",
+        "Midday break? Would you like me to help organize something?"
+      ]
+    },
+    "evening": {
+      "time_range": {
+        "start": "18:00",
+        "end": "22:00"
+      },
+      "suggestions": [
+        "Evening! How did your day go?",
+        "Winding down? Should I help you plan tomorrow?",
+        "End of day - any accomplishments to celebrate?"
+      ]
+    }
+  },
+  "usage_based_suggestions": {
+    "frequent_commands": {},
+    "command_sequences": {},
+    "context_triggers": {}
+  },
+  "situation_based_suggestions": {
+    "weather_alerts": true,
+    "reminder_notifications": true,
+    "productivity_tips": true,
+    "learning_suggestions": true
+  },
+  "smart_interruptions": {
+    "max_per_hour": 2,
+    "quiet_hours": {
+      "start": "22:00",
+      "end": "08:00"
+    },
+    "respect_focus_time": true
+  }
+}

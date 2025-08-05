@@ -26,11 +26,13 @@
     "personal_info": {}
   },
   "learning": {
-    "command_usage": {},
+    "command_usage": {
+      "search": 1
+    },
     "correction_history": [],
     "habits": {},
     "frequent_requests": []
   },
   "created_date": "2025-08-05T12:57:17.518147",
-  "last_interaction": "2025-08-05T12:57:17.518287"
+  "last_interaction": "2025-08-05T20:03:43.370389"
 }
