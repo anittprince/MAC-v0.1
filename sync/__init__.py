@@ -1,1 +1,0 @@
-# MAC Assistant Sync Module

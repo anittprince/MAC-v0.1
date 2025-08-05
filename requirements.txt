@@ -1,16 +1,15 @@
-# MAC Assistant - Cross-Platform Dependencies
-# Core dependencies (all platforms)
-fastapi==0.104.1
-uvicorn==0.24.0
+# MAC Assistant - Core Dependencies
+# Core voice and AI functionality
 vosk==0.3.45
 pyttsx3==2.90
 SpeechRecognition==3.10.0
 pyaudio==0.2.11
 requests==2.31.0
-python-multipart==0.0.6
-pydantic==2.5.0
 python-dotenv==1.0.0
 google-generativeai==0.3.1
+googletrans==4.0.0rc1
+langdetect
+pytesseract
 
 # Windows-specific dependencies
 psutil==5.9.6; sys_platform == "win32"

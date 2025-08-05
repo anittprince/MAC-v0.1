@@ -706,12 +706,10 @@ def print_banner():
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="MAC Assistant - Cross-Platform Voice Assistant")
-    parser.add_argument("--mode", choices=["voice", "text", "server"], default="voice",
-                       help="Mode to run in: voice (default), text, or server")
+    parser.add_argument("--mode", choices=["voice", "text"], default="voice",
+                       help="Mode to run in: voice (default) or text")
     parser.add_argument("--model", default="models/vosk-model",
                        help="Path to Vosk model directory")
-    parser.add_argument("--host", default="0.0.0.0", help="Server host (server mode only)")
-    parser.add_argument("--port", type=int, default=8000, help="Server port (server mode only)")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument("--no-speech", action="store_true", help="Disable text-to-speech in text mode")
     
@@ -720,13 +718,7 @@ def main():
     # Print banner
     print_banner()
     
-    if args.mode == "server":
-        # Run as API server
-        print("Starting MAC Assistant API Server...")
-        from sync.api import run_server
-        run_server(host=args.host, port=args.port, debug=args.debug)
-    
-    elif args.mode == "text":
+    if args.mode == "text":
         # Run in text mode
         assistant = MACAssistant(model_path=args.model)
         enable_speech = not args.no_speech
